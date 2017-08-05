@@ -3,11 +3,18 @@ import requests
 from googleapiclient.discovery import build
 import authinfo
 
-def isContent(url):
+# Maximum content size to fetch - VGA 24 bit + overhead
+MAXIMUM_CONTENT_SIZE = int(640*480*3*1.10)
+
+def isSmallContent(url):
     header = requests.head(url, allow_redirects=True).headers
     content_type = header.get('content-type')
     if 'text' in content_type.lower() or 'html' in content_type.lower():
         print("content-type: {}".format(content_type))
+        return False
+    content_length = int(header.get('content-length') or MAXIMUM_CONTENT_SIZE+1)
+    if content_length > MAXIMUM_CONTENT_SIZE:
+        print("content-length: {}".format(content_length))
         return False
     return True
 
@@ -29,7 +36,7 @@ def main():
   else:
       for item in res['items']:
           image_url = item['link']
-          if not image_url or not isContent(image_url):
+          if not image_url or not isSmallContent(image_url):
             print("Skipping {}".format(item['link'].encode('utf-8')))
             continue
           print("Fetching {} from {}".format(item['title'].encode('utf-8'), item['link'].encode('utf-8')))

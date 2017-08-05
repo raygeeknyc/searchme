@@ -1,6 +1,7 @@
 import PIL
 from PIL import Image
 import io
+from StringIO import StringIO
 
 import requests
 
@@ -49,6 +50,6 @@ def main():
             print("Skipping {}".format(item['link'].encode('utf-8')))
             continue
           print("Fetching {} from {}".format(item['title'].encode('utf-8'), item['link'].encode('utf-8')))
-          image_stream = requests.get(image_url, stream=True, allow_redirects=True).raw
+          image_stream = StringIO(requests.get(image_url, stream=True, allow_redirects=True).content)
           display(image_stream)
 main()

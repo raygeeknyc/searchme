@@ -9,6 +9,7 @@ import authinfo
 
 # Maximum content size to fetch - VGA 24 bit + overhead
 MAXIMUM_CONTENT_SIZE = int(640*480*3*1.10)
+DISPLAY_RESOLUTION = (640,480)
 
 def isSmallContent(url):
     header = requests.head(url, allow_redirects=True).headers
@@ -24,7 +25,7 @@ def isSmallContent(url):
 
 def display(image_stream):
     image = Image.open(image_stream)
-    image = image.resize((640, 480))
+    image = image.resize(DISPLAY_RESOLUTION)
 
 def main():
   # Build a service object for interacting with the API. Visit

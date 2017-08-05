@@ -1,3 +1,7 @@
+import PIL
+from PIL import Image
+import io
+
 import requests
 
 from googleapiclient.discovery import build
@@ -17,6 +21,10 @@ def isSmallContent(url):
         print("content-length: {}".format(content_length))
         return False
     return True
+
+def display(image_stream):
+    image = Image.open(image_stream)
+    image = image.resize((640, 480))
 
 def main():
   # Build a service object for interacting with the API. Visit
@@ -40,5 +48,6 @@ def main():
             print("Skipping {}".format(item['link'].encode('utf-8')))
             continue
           print("Fetching {} from {}".format(item['title'].encode('utf-8'), item['link'].encode('utf-8')))
-          image = requests.get(image_url, allow_redirects=True)
+          image_stream = requests.get(image_url, stream=True, allow_redirects=True).raw
+          display(image_stream)
 main()

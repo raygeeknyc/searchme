@@ -8,17 +8,19 @@ import requests
 from googleapiclient.discovery import build
 import authinfo
 
+QUERY="pretty flower"
+
 # Maximum content size to fetch - VGA 24 bit + overhead
-MAXIMUM_CONTENT_SIZE = int(640*480*3*1.10)
+MAXIMUM_CONTENT_SIZE = int(640*480*3*1.05)
 DISPLAY_RESOLUTION = (640,480)
 
 def isSmallContent(url):
     header = requests.head(url, allow_redirects=True).headers
-    content_type = header.get('content-type')
-    if 'text' in content_type.lower() or 'html' in content_type.lower():
+    content_type = header.get("content-type")
+    if "text" in content_type.lower() or "html" in content_type.lower():
         print("content-type: {}".format(content_type))
         return False
-    content_length = int(header.get('content-length') or MAXIMUM_CONTENT_SIZE+1)
+    content_length = int(header.get("content-length") or MAXIMUM_CONTENT_SIZE+1)
     if content_length > MAXIMUM_CONTENT_SIZE:
         print("content-length: {}".format(content_length))
         return False
@@ -36,20 +38,21 @@ def main():
             developerKey=authinfo.developer_key)
 
   res = service.cse().list(
-      q='pretty bird movie',
+      q=QUERY,
       searchType = "image",
-      cx=authinfo.ctx
+      cx=authinfo.ctx,
+      safe="medium"
     ).execute()
 
-  if not 'items' in res:
+  if not "items" in res:
       print("No result !!\nres is: {}".format(res))
   else:
-      for item in res['items']:
-          image_url = item['link']
+      for item in res["items"]:
+          image_url = item["link"]
           if not image_url or not isSmallContent(image_url):
-            print("Skipping {}".format(item['link'].encode('utf-8')))
+            print("Skipping {}".format(item["link"].encode("utf-8")))
             continue
-          print("Fetching {} from {}".format(item['title'].encode('utf-8'), item['link'].encode('utf-8')))
+          print("Fetching {} from {}".format(item["title"].encode("utf-8"), item["link"].encode("utf-8")))
           image_stream = StringIO(requests.get(image_url, stream=True, allow_redirects=True).content)
           display(image_stream)
 main()
